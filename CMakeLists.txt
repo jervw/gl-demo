@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.16)
 project(learn-opengl)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -13,7 +13,7 @@ find_package(glfw3 REQUIRED)
 include_directories(${GLFW_INCLUDE_DIRS})
 link_libraries(${GLFW_LIBRARY_DIRS})
 
-set(SOURCE_FILES src/main.cc)
-add_executable(learn-opengl ${SOURCE_FILES})
+file (GLOB GLOB_SRC src/*.cc)
+add_executable(learn-opengl ${GLOB_SRC})
 
 target_link_libraries(learn-opengl ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
