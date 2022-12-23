@@ -1,5 +1,16 @@
 cmake_minimum_required(VERSION 3.16)
-project(learn-opengl)
+project(opengl)
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  MESSAGE("Clang")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  MESSAGE("GNU")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+  MESSAGE("Intel")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  MESSAGE("MSVC")
+endif()
+
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -14,6 +25,6 @@ include_directories(${GLFW_INCLUDE_DIRS})
 link_libraries(${GLFW_LIBRARY_DIRS})
 
 file (GLOB GLOB_SRC src/*.cc)
-add_executable(learn-opengl ${GLOB_SRC})
+add_executable(opengl ${GLOB_SRC})
 
-target_link_libraries(learn-opengl ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+target_link_libraries(opengl ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
