@@ -36,12 +36,11 @@ Program::Program() {
 }
 
 void Program::run() {
-
-    // Create shader
-    Shader shader("vertex.glsl", "fragment.glsl");
+    // load shaders which are located in src/shaders
+    Shader simple_shader("../src/shaders/simple.vert", "../src/shaders/simple.frag");
 
     // create cube mesh
-    Mesh cube("cube.obj", 0);
+    //Mesh cube("../res/cube.obj", simple_shader);
 
     // Main loop
     while (!glfwWindowShouldClose(window_)) {
@@ -52,7 +51,9 @@ void Program::run() {
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // create new mesh
+        // Draw cube
+        // cube.draw();
+
 
         // glfw swap buffers and poll IO events
         glfwSwapBuffers(window_);

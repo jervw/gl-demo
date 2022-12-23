@@ -1,18 +1,19 @@
 #include "mesh.h"
 #include "obj_loader.h"
 
-Mesh::Mesh(std::string file, GLuint shader) {
-    file = file;
+#include <iostream>
+
+Mesh::Mesh(std::string file, Shader shader) {
+    file_ = file;
     model_matrix_ = glm::mat4(1);
     translate_matrix_ = glm::mat4(1);
     rotation_matrix_ = glm::mat4(1);
-    shader_ = shader;
+    shader_ = shader.get_program_id();
+
     load();
 }
 
-Mesh::~Mesh() { clear(); }
-
-void Mesh::clear() {
+Mesh::~Mesh() {
     vertices_.clear();
     uvs_.clear();
     normals_.clear();
@@ -22,7 +23,7 @@ void Mesh::clear() {
     glDeleteVertexArrays(1, &vao_);
 }
 
-void Mesh::draw_mesh() {
+void Mesh::draw() {
     model_matrix_ = translate_matrix_ * rotation_matrix_;
     glUniformMatrix4fv(model_matrix_id_, 1, GL_FALSE, &model_matrix_[0][0]);
 
@@ -36,7 +37,10 @@ void Mesh::translate(glm::vec3 position) {
 }
 
 void Mesh::load() {
-    load_obj(file.c_str(), vertices_, uvs_, normals_);
+    if (!load_obj(file_.c_str(), vertices_, uvs_, normals_)) {
+        std::cout << "Failed to load mesh from file: " << file_ << std::endl;
+        return;
+    };
 
     glGenBuffers(1, &vbo_);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
