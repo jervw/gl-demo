@@ -8,31 +8,29 @@
 #include <string>
 #include <vector>
 
+class Mesh {
+  public:
+    std::string file;
+    Mesh(std::string file, GLuint shader);
+    ~Mesh();
+    void clear();
+    void draw_mesh();
+    void translate(glm::vec3 position);
 
-class Mesh  
-{
-public:
-	std::string m_file;
-	Mesh(std::string file, GLuint shader);
-	~Mesh();
-	void clear();
-	void draw_mesh();
-	void translate(glm::vec3 position);
- 
-private:
-	std::vector<glm::vec3> m_vertices;
-	std::vector<glm::vec2> m_uvs;
-	std::vector<glm::vec3> m_normals;
-	GLuint m_vbo;
-	GLuint m_vcb;
-	GLuint m_vao;
-	GLuint m_modelMatrixID;
-	glm::mat4 m_translateMatrix;
-	glm::mat4 m_rotationMatrix;
-	glm::mat4 m_modelMatrix;
-	GLuint m_shader;
- 
-	void load();
+  private:
+    std::vector<glm::vec3> vertices_;
+    std::vector<glm::vec2> uvs_;
+    std::vector<glm::vec3> normals_;
+    GLuint vbo_;
+    GLuint vcb_;
+    GLuint vao_;
+    GLuint model_matrix_id_;
+    glm::mat4 translate_matrix_;
+    glm::mat4 rotation_matrix_;
+    glm::mat4 model_matrix_;
+    GLuint shader_;
+
+    void load();
 };
 
 #endif
