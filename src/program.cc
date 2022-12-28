@@ -28,8 +28,8 @@ Program::Program() {
     window_ = glfwCreateWindow(WIDTH, HEIGHT, "OpenGL", nullptr, nullptr);
     glfwMakeContextCurrent(window_);
     glfwSetFramebufferSizeCallback(window_, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window_, mouse_callback);
-    glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetCursorPosCallback(window_, mouse_callback);
+    //glfwSetInputMode(window_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewInit();
 
