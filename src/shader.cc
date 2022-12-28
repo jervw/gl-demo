@@ -1,51 +1,54 @@
 #include "shader.h"
-#include <iostream>
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath) {
-    std::string vertexCode;
-    std::string fragmentCode;
-    std::ifstream vShaderFile;
-    std::ifstream fShaderFile;
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
+Shader::Shader(const char* vertex_path, const char* fragment_path) {
+    std::string vertex_code;
+    std::string fragment_code;
+    std::ifstream vertex_file;
+    std::ifstream fragment_file;
 
     // ensure ifstream objects can throw exceptions:
-    vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    vertex_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    fragment_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
     try {
         // open files
-        vShaderFile.open(vertexPath);
-        fShaderFile.open(fragmentPath);
-        std::stringstream vShaderStream, fShaderStream;
+        vertex_file.open(vertex_path);
+        fragment_file.open(fragment_path);
+        std::stringstream vertex_fstream, fragment_fstream;
 
         // read file's buffer contents into streams
-        vShaderStream << vShaderFile.rdbuf();
-        fShaderStream << fShaderFile.rdbuf();
+        vertex_fstream << vertex_file.rdbuf();
+        fragment_fstream << fragment_file.rdbuf();
 
         // close file handlers
-        vShaderFile.close();
-        fShaderFile.close();
+        vertex_file.close();
+        fragment_file.close();
 
         // convert stream into string
-        vertexCode = vShaderStream.str();
-        fragmentCode = fShaderStream.str();
+        vertex_code = vertex_fstream.str();
+        fragment_code = fragment_fstream.str();
 
     } catch (std::ifstream::failure& e) {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << std::endl;
     }
 
-    const char* vShaderCode = vertexCode.c_str();
-    const char* fShaderCode = fragmentCode.c_str();
+    const char* vertex_code_c = vertex_code.c_str();
+    const char* fragment_code_c = fragment_code.c_str();
     unsigned int vertex, fragment;
 
     // vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vShaderCode, NULL);
+    glShaderSource(vertex, 1, &vertex_code_c, nullptr);
     glCompileShader(vertex);
     check_errors(vertex, "VERTEX");
 
     // fragment Shader
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fShaderCode, NULL);
+    glShaderSource(fragment, 1, &fragment_code_c, nullptr);
     glCompileShader(fragment);
     check_errors(fragment, "FRAGMENT");
 

@@ -1,5 +1,5 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include "../thirdparty/stb_image.h"
+#include "../lib/stb_image.h"
 
 #include "camera.h"
 #include "program.h"
@@ -7,14 +7,14 @@
 
 #include <iostream>
 
-// Camera cam_ = Camera(glm::vec3(0.f, 0.f, 5.f));
+Camera cam_ = Camera(glm::vec3(0.f, 0.f, 10.f));
 float delta_time = 0.0f;
 float last_frame = 0.0f;
 
 glm::vec3 cube_positions[] = {
-    glm::vec3(-3.f, 0.0f, 0.0f),
+    glm::vec3(-5.f, 0.0f, 0.0f),
     glm::vec3(0.0f, 0.0f, 0.0f),
-    glm::vec3(3.0f, 0.0f, 0.0f),
+    glm::vec3(5.0f, 0.0f, 0.0f),
 };
 
 // Setup window and OpenGL context
@@ -56,7 +56,7 @@ void Program::run() {
     glEnable(GL_DEPTH_TEST);
 
     // Create shader
-    Shader shader("../src/shader.vs", "../src/shader.fs");
+    Shader shader("../src/shaders/default.vert", "../src/shaders/default.frag");
 
     // Load and create a texture
     unsigned int texture;
@@ -85,50 +85,54 @@ void Program::run() {
     shader.use();
     shader.set_int("texture", 0);
 
+    // Set up projection matrix
+    glm::mat4 projection =
+        glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+    shader.set_mat4("projection", projection);
+
+    // Set up view matrix
+    glm::mat4 view = cam_.get_view_matrix();
+    shader.set_mat4("view", view);
+
+    // Set up model matrix
+    glm::mat4 model = glm::mat4(1.0f);
+    shader.set_mat4("model", model);
+
+    // time variables for cube translation
+    float time = 0.0f;
+    float velocity = 2.f;
+    float amplitude = 0.05f;
+
     // Main loop
     while (!glfwWindowShouldClose(window_)) {
-        // Calculate delta time
-        float current_frame = static_cast<float>(glfwGetTime());
+        // time calculations
+        float current_frame = glfwGetTime();
         delta_time = current_frame - last_frame;
         last_frame = current_frame;
+        time += delta_time;
 
-        // Input
+        // input
         process_input(window_);
 
-        // Render
+        // clear screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // bind texture
-        glActiveTexture(GL_TEXTURE0);
+        // Update cube positions of first and second cube
+        cube_positions[0].x += amplitude * sin(velocity * time);
+        cube_positions[1].y -= amplitude * sin(velocity * time);
+
+        glBindVertexArray(vao_);
         glBindTexture(GL_TEXTURE_2D, texture);
-
-        // activate shader
-        shader.use();
-
-        // create transformations
-        glm::mat4 view = glm::mat4(1.0f);
-        glm::mat4 projection = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -10.0f));
-        projection =
-            glm::perspective(glm::radians(45.0f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
-        unsigned int viewLoc = glGetUniformLocation(shader.ID, "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-        shader.set_mat4("projection", projection);
 
         // render 3 cubes
         for (unsigned i = 0; i < 3; i++) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cube_positions[i]);
-            float angle = 20.0f * i * glfwGetTime();
-            model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+            model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
             shader.set_mat4("model", model);
-
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-
-        glBindVertexArray(vao_);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // glfw swap buffers and poll IO events
         glfwSwapBuffers(window_);
@@ -145,12 +149,14 @@ void Program::process_input(GLFWwindow* window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) cam_.process_keyboard(FORWARD, delta_time);
-    // if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) cam_.process_keyboard(BACKWARD,
-    // delta_time);
-
-    // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) cam_.process_keyboard(LEFT, delta_time);
-    // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) cam_.process_keyboard(RIGHT, delta_time);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cam_.process_kb(FORWARD, delta_time);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cam_.process_kb(BACKWARD, delta_time);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cam_.process_kb(LEFT, delta_time);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cam_.process_kb(RIGHT, delta_time);
 }
 
 void Program::mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
@@ -168,9 +174,9 @@ void Program::mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
     float yoffset = last_y_ - ypos; // reverse y axis
 
     last_x_ = xpos;
-    last_x_ = ypos;
+    last_y_ = ypos;
 
-    // cam_.process_mouse_movement(xoffset, yoffset);
+    cam_.process_mouse(xoffset, yoffset);
 }
 
 void Program::framebuffer_size_callback(GLFWwindow* window, int width, int height) {

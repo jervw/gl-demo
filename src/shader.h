@@ -5,14 +5,12 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include <fstream>
-#include <sstream>
 #include <string>
 
 class Shader {
   public:
     unsigned int ID;
-    Shader(const char* vertexPath, const char* fragmentPath);
+    Shader(const char* vertex_path, const char* fragment_path);
     void use();
     void set_bool(const std::string& name, bool value) const;
     void set_int(const std::string& name, int value) const;
