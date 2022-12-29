@@ -2,7 +2,7 @@
 
 Camera::Camera(glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
     : front_(glm::vec3(0.0f, 0.0f, -1.0f)), movement_speed(SPEED), mouse_sensitivity(SENSITIVITY),
-      zoom(ZOOM) {
+      fov(FOV) {
     position_ = pos;
     world_up_ = up;
     yaw_ = yaw;
@@ -14,27 +14,29 @@ Camera::Camera(glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
 glm::mat4 Camera::get_view_matrix() { return glm::lookAt(position_, position_ + front_, up_); }
 
 void Camera::update_camera() {
+    using namespace glm;
+
     // calculate the new front vector
-    glm::vec3 front;
-    front.x = cos(glm::radians(yaw_)) * cos(glm::radians(pitch_));
-    front.y = sin(glm::radians(pitch_));
-    front.z = sin(glm::radians(yaw_)) * cos(glm::radians(pitch_));
-    front_ = glm::normalize(front);
+    vec3 front;
+    front.x = cos(radians(yaw_)) * cos(radians(pitch_));
+    front.y = sin(radians(pitch_));
+    front.z = sin(radians(yaw_)) * cos(radians(pitch_));
+    front_ = normalize(front);
 
     // also re-calculate the right and up vector
-    right_ = glm::normalize(glm::cross(front_, world_up_));
-    up_ = glm::normalize(glm::cross(right_, front_));
+    right_ = normalize(cross(front_, world_up_));
+    up_ = normalize(cross(right_, front_));
 }
 
-void Camera::process_kb(Movement direction, float deltaTime) {
+void Camera::process_keyboard(Movement direction, float deltaTime) {
     float velocity = movement_speed * deltaTime;
-    if (direction == FORWARD)
+    if (direction == Movement::FORWARD)
         position_ += front_ * velocity;
-    if (direction == BACKWARD)
+    if (direction == Movement::BACKWARD)
         position_ -= front_ * velocity;
-    if (direction == LEFT)
+    if (direction == Movement::LEFT)
         position_ -= right_ * velocity;
-    if (direction == RIGHT)
+    if (direction == Movement::RIGHT)
         position_ += right_ * velocity;
 }
 
@@ -52,4 +54,3 @@ void Camera::process_mouse(float xoffset, float yoffset) {
 
     update_camera();
 }
-

@@ -7,14 +7,14 @@
 
 #include <vector>
 
-enum Movement { FORWARD, BACKWARD, LEFT, RIGHT };
+enum class Movement { FORWARD, BACKWARD, LEFT, RIGHT };
 
 // default camera values
 const float YAW = -90.0f;
 const float PITCH = 0.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
-const float ZOOM = 45.0f;
+const float FOV = 45.0f;
 
 class Camera {
   public:
@@ -24,12 +24,12 @@ class Camera {
     // camera options
     float movement_speed;
     float mouse_sensitivity;
-    float zoom;
+    float fov;
 
-    // returns the view matrix calculated using Euler Angles and the LookAt Matrix
+    // returns the view matrix
     glm::mat4 get_view_matrix();
 
-    void process_kb(Movement direction, float deltaTime);
+    void process_keyboard(Movement direction, float deltaTime);
     void process_mouse(float xoffset, float yoffset);
 
   private:
