@@ -7,6 +7,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "shader.h"
+#include "material.h"
 
 #include <iostream>
 #include <string>
@@ -26,23 +27,27 @@ struct Texture {
     std::string path;
 };
 
+// TODO seperate header and source file
+
 class Mesh {
   public:
-    // mesh Data
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    std::vector<Texture> textures;
-    unsigned int vao;
-
-    // constructor
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
-         std::vector<Texture> textures) {
+         std::vector<Texture> textures, Material material) {
         this->vertices = vertices;
         this->indices = indices;
         this->textures = textures;
+        this->material = material;
 
         setup_mesh();
     }
+
+    // mesh data
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+    std::vector<Texture> textures;
+
+    Material material;
+    unsigned int vao;
 
     // render the mesh
     void draw(Shader& shader) {
@@ -69,6 +74,14 @@ class Mesh {
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
+
+        // debug print all material values
+
+        // set material properties
+        shader.set_vec3("material.ambient", material.ambient);
+        shader.set_vec3("material.diffuse", material.diffuse);
+        shader.set_vec3("material.specular", material.specular);
+        shader.set_float("material.shininess", material.shininess);
 
         // draw mesh
         glBindVertexArray(vao);

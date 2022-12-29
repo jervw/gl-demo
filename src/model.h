@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 
+
 class Model {
   public:
     Model(std::string path, bool gamma = false);
@@ -28,6 +29,7 @@ class Model {
     bool gamma_correction;
 
   private:
+    Material load_material(aiMaterial* mat);
     void process_node(aiNode* node, const aiScene* scene);
     Mesh process_mesh(aiMesh* mesh, const aiScene* scene);
     std::vector<Texture> load_material_textures(aiMaterial* mat, aiTextureType type,

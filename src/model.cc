@@ -1,7 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../lib/stb_image.h"
 
-
 #include "model.h"
 
 Model::Model(std::string path, bool gamma) : gamma_correction(gamma) {
@@ -26,6 +25,37 @@ Model::Model(std::string path, bool gamma) : gamma_correction(gamma) {
     process_node(scene->mRootNode, scene);
 
     std::cout << "Model loaded: " << path << std::endl;
+}
+
+void Model::draw(Shader shader) {
+    for (unsigned int i = 0; i < meshes.size(); i++) {
+        meshes[i].draw(shader);
+    }
+}
+
+Material Model::load_material(aiMaterial* mat) {
+    Material material;
+
+    aiColor3D color(0.f, 0.f, 0.f);
+
+    // ambient
+    mat->Get(AI_MATKEY_COLOR_AMBIENT, color);
+    material.ambient = glm::vec3(color.r, color.g, color.b);
+
+    // diffuse
+    mat->Get(AI_MATKEY_COLOR_DIFFUSE, color);
+    material.diffuse = glm::vec3(color.r, color.g, color.b);
+
+    // specular
+    mat->Get(AI_MATKEY_COLOR_SPECULAR, color);
+    material.specular = glm::vec3(color.r, color.g, color.b);
+
+    // shininess
+    float shininess;
+    mat->Get(AI_MATKEY_SHININESS, shininess);
+    material.shininess = shininess;
+
+    return material;
 }
 
 void Model::process_node(aiNode* node, const aiScene* scene) {
@@ -84,6 +114,7 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene) {
 
     // process materials
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+    Material mat = load_material(material);
 
     // diffuse maps
     std::vector<Texture> diffuse_maps =
@@ -105,7 +136,7 @@ Mesh Model::process_mesh(aiMesh* mesh, const aiScene* scene) {
         load_material_textures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), height_maps.begin(), height_maps.end());
 
-    return Mesh(vertices, indices, textures);
+    return Mesh(vertices, indices, textures, mat);
 }
 
 std::vector<Texture> Model::load_material_textures(aiMaterial* mat, aiTextureType type,
@@ -132,12 +163,6 @@ std::vector<Texture> Model::load_material_textures(aiMaterial* mat, aiTextureTyp
         }
     }
     return textures;
-}
-
-void Model::draw(Shader shader) {
-    for (unsigned int i = 0; i < meshes.size(); i++) {
-        meshes[i].draw(shader);
-    }
 }
 
 unsigned int Model::texture_from_file(const char* path, const std::string& directory) {

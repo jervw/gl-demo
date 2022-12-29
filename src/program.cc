@@ -5,9 +5,11 @@
 
 #include <iostream>
 
+const double FPS_LIMIT = 200;
+
 Camera cam_ = Camera(glm::vec3(0.f, 0.f, 10.f));
-float delta_time = 0.0f;
-float last_frame = 0.0f;
+double delta_time = 0.0f;
+double last_frame = 0.0f;
 
 // Setup window and OpenGL context
 Program::Program() {
@@ -16,6 +18,9 @@ Program::Program() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+    // unlimit fps
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GL_FALSE);
 
     window_ = glfwCreateWindow(WIDTH, HEIGHT, "OpenGL", nullptr, nullptr);
     glfwMakeContextCurrent(window_);
@@ -37,43 +42,49 @@ void Program::run() {
     shader.use();
 
     // Create model
-    Model backpack("../assets/sus.obj");
+    Model scene("../assets/scene/scene.obj");
 
-    for(auto i : backpack.textures_loaded) {
+    for (auto i : scene.textures_loaded) {
         std::cout << "texture loaded: " << i.type << std::endl;
     }
+
+    // setup projection matrix
+    glm::mat4 projection =
+        glm::perspective(glm::radians(cam_.zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.f);
+    shader.set_mat4("projection", projection);
 
     // Main loop
     while (!glfwWindowShouldClose(window_)) {
         // time calculations
-        float current_frame = glfwGetTime();
+        double current_frame = glfwGetTime();
         delta_time = current_frame - last_frame;
-        last_frame = current_frame;
 
-        // input
-        process_input(window_);
-
-        // clear screen
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // setup camera and projection
-        glm::mat4 projection =
-            glm::perspective(glm::radians(cam_.zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.f);
-        glm::mat4 view = cam_.get_view_matrix();
-        shader.set_mat4("projection", projection);
-        shader.set_mat4("view", view);
-
-        // render model
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.f, 0.f, 0.f)); // center the model
-        model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));  // scale the model
-        shader.set_mat4("model", model);
-        backpack.draw(shader);
-
-        // glfw swap buffers and poll IO events
-        glfwSwapBuffers(window_);
         glfwPollEvents();
+
+        if ((current_frame - last_frame) >= 1.0 / FPS_LIMIT) {
+            // input
+            process_input(window_);
+
+            // clear screen
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            // setup camera and projection
+            glm::mat4 view = cam_.get_view_matrix();
+            shader.set_mat4("view", view);
+
+            // render model
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(0.f, 0.f, 0.f)); // center the model
+            model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));  // scale the model
+            shader.set_mat4("model", model);
+            scene.draw(shader);
+
+            // glfw swap buffers and poll IO events
+            glfwSwapBuffers(window_);
+
+            last_frame = current_frame;
+        }
     }
 
     glfwTerminate();
