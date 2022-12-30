@@ -1,9 +1,15 @@
 #ifndef PROGRAM_H
 #define PROGRAM_H
 
+#include "camera.h"
+#include "lights.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <vector>
 
 class Program {
   public:
@@ -13,19 +19,16 @@ class Program {
     void run();
 
   private:
-    static constexpr unsigned WIDTH = 1280;
-    static constexpr unsigned HEIGHT = 720;
-
-    static inline float last_x_ = WIDTH / 2.f;
-    static inline float last_y_ = HEIGHT / 2.f;
-    static inline bool first_mouse_ = true;
-
+    // callback functions
     static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
     static void process_input(GLFWwindow* window);
     static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
     GLFWwindow* window_;
-    unsigned int vbo_, vao_;
+
+    // camera
+    static inline Camera cam_ = Camera(glm::vec3(0.f, 2.f, 8.f));
+    static inline DirectionalLight light = DirectionalLight(glm::vec3(0.f, 0.f, -1.f));
 };
 
 #endif

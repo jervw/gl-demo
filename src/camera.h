@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include <vector>
 
@@ -14,17 +15,18 @@ const float YAW = -90.0f;
 const float PITCH = 0.0f;
 const float SPEED = 2.5f;
 const float SENSITIVITY = 0.1f;
-const float FOV = 45.0f;
+const float FOV = 85.0f;
 
 class Camera {
   public:
-    Camera(glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
-           float yaw = YAW, float pitch = PITCH);
+    Camera(glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
 
     // camera options
     float movement_speed;
     float mouse_sensitivity;
     float fov;
+
+    glm::vec3 position;
 
     // returns the view matrix
     glm::mat4 get_view_matrix();
@@ -34,7 +36,7 @@ class Camera {
 
   private:
     // camera Attributes
-    glm::vec3 position_, front_, up_, right_, world_up_;
+    glm::vec3 front_, up_, right_, world_up_;
 
     // euler Angles
     float yaw_, pitch_;

@@ -18,7 +18,7 @@
 
 class Model {
   public:
-    Model(std::string path, bool gamma = false);
+    Model(std::string path);
 
     void draw(Shader shader);
 
@@ -26,7 +26,6 @@ class Model {
     std::vector<Texture> textures_loaded;
     std::vector<Mesh> meshes;
     std::string directory;
-    bool gamma_correction;
 
   private:
     Material load_material(aiMaterial* mat);

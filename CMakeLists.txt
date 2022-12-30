@@ -19,4 +19,4 @@ link_libraries(${GLFW_LIBRARY_DIRS})
 file (GLOB GLOB_SRC src/*.cc)
 add_executable(opengl ${GLOB_SRC})
 
-target_link_libraries(opengl ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${ASSIMP_LIBRARIES} glfw)
+target_link_libraries(opengl PUBLIC ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${ASSIMP_LIBRARIES} glfw)

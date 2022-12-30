@@ -1,9 +1,9 @@
 #define STB_IMAGE_IMPLEMENTATION
-#include "../lib/stb_image.h"
+#include "../external/stb_image.h"
 
 #include "model.h"
 
-Model::Model(std::string path, bool gamma) : gamma_correction(gamma) {
+Model::Model(std::string path) {
     // stb image flip on y axis
     stbi_set_flip_vertically_on_load(true);
 
