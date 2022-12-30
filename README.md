@@ -1,9 +1,9 @@
 <div align="center">
-<h1>OpenGL - 3D Scene/h1>
+<h1>OpenGL - 3D Scene</h1>
 </div>
 
 <p align=center>
-Simple scene with simple lightning, written in C++17.
+Simple scene with simple lightning, written in C++17. 
 </p>
 
 <p align=center>
