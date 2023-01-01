@@ -17,7 +17,6 @@ Simple scene with simple lightning, written in C++17.
 - glew
 - glm
 - [assimp](https://github.com/assimp/assimp)
-- [stb_image](https://github.com/nothings/stb)
 
 
 ## Installation
