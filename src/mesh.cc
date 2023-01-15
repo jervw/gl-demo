@@ -12,10 +12,10 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
 
 // render the mesh
 void Mesh::draw(Shader& shader) {
-    unsigned int diffuseNr = 1;
-    unsigned int specularNr = 1;
-    unsigned int normalNr = 1;
-    unsigned int heightNr = 1;
+    unsigned int diffuse_nr = 1;
+    unsigned int specular_nr = 1;
+    unsigned int normal_nr = 1;
+    unsigned int height_nr = 1;
 
     // bind appropriate textures
     for (unsigned int i = 0; i < textures.size(); i++) {
@@ -25,13 +25,13 @@ void Mesh::draw(Shader& shader) {
         glActiveTexture(GL_TEXTURE0 + i);
 
         if (name == "texture_diffuse")
-            number = std::to_string(diffuseNr++);
+            number = std::to_string(diffuse_nr++);
         else if (name == "texture_specular")
-            number = std::to_string(specularNr++);
+            number = std::to_string(specular_nr++);
         else if (name == "texture_normal")
-            number = std::to_string(normalNr++);
+            number = std::to_string(normal_nr++);
         else if (name == "texture_height")
-            number = std::to_string(heightNr++);
+            number = std::to_string(height_nr++);
 
         // set the sampler to the correct texture unit
         glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
